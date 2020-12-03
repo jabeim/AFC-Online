@@ -32,7 +32,7 @@ if success >= 1 && strcmp(app.NextButton.Text,'Begin Experiment')
     
     %% Modify afc startup command for your experiment here
 
-    afc_main('Stripes',id,'n640','0','l','16ch0shift',figHandle)
+    afc_main('Stripes',id,'n640','0','l','EXAMPLE',figHandle) % figHandle must be the final input argument.
 
     return
 end
