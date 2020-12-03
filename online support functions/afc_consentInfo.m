@@ -1,4 +1,4 @@
-function [consent, consentElement] = afc_consentInfo(app,)
+function [consent, consentElement] = afc_consentInfo(app)
 %AFC_CONSENTINFO Creates an html inset in the current figure window for displaying a pdf file consent
 %form using the html code stored in consentDisplay.html. 
 %
@@ -19,7 +19,8 @@ function [consent, consentElement] = afc_consentInfo(app,)
 consentFile = '/web/catss/Audio/consentDisplay.html';
 
 consentElement = uihtml(app.UIFigure);
-consentElement.Position  = [10 150 620 310];
+windowSize = repmat(app.UIFigure.Position(3:4),1,2);
+consentElement.Position  = [0.0156    0.3125    0.9688    0.6458].*windowSize; % [10 150 620 310]
 consentElement.Visible = 'on';
 consentElement.HTMLSource = consentFile;
 
