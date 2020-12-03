@@ -65,25 +65,13 @@ function [wavOut,envMean, envLo, envHi]= spiral(wavIn, nElectrodes, carrierDensi
         speechband = speechband.*(speechband>0);                                                            % envelope extraction by half-wave rectification
         %% Add dynamic range compression to each envelope here
         envelope(:,j) = conv(speechband,lp_filter,'same')';                                                 % low-pass filter envelope
-        figure(1)
-%         subplot(121),plot(20*log10(envelope(:,j).^2))
-%         if j == 1; hold on; end
-%         if j == nElectrodes; hold off; end
-%         
-%         envMean(j) = mean(envelope(1000:2000,j)-4.656*std(envelope(1000:2000,j)));  %99.999% CI of noise floor amplitude.
-%         envLo(j) = min(envelope(:,j));
-%         envHi(j) = max(envelope(:,j));
         
         if dynamicRange(j) < inf % rescale only if dynamic range set
             compressedEnvelope(:,j) = rescale(envelope(:,j),lowerBound(j),mean(envMax));  % rescale envelope to [envMax-dynamicRange envMax)
             compressedEnvelope(envelope(:,j) >= 50*envMax(j),j) = 0; % zero points above envMax to reduce signal noise
-%             subplot(122),plot(20*log10(compressedEnvelope(:,j).^2))
-%             if j == 1; hold on; end
-%             if j == nElectrodes; hold off; linkaxes;  end
         else
             compressedEnvelope(:,j) = envelope(:,j);                   
         end
-%         pause
     end
     
 
