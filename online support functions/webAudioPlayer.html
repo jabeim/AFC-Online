@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script type="text/javascript">
+
+	function setup(htmlComponent) {					          
+		htmlComponent.addEventListener("DataChanged", function(event) {
+            
+            	var aud = document.getElementById("matlabWebAudioPlayer"); 
+            
+            	document.getElementById("dataFromMATLAB").innerHTML = "MATLAB STATE: " + htmlComponent.Data[0];
+            
+                if(htmlComponent.Data[0] == -1) {
+                    aud.addEventListener("canplaythrough", function(event) {
+                        htmlComponent.Data = 1;
+                        document.getElementById("dataInHTML").innerHTML = "HTML STATE: " + htmlComponent.Data+aud.src;
+                    },true);
+                    aud.addEventListener("play", function(event) {
+                        htmlComponent.Data = 3;
+                        document.getElementById("dataInHTML").innerHTML = "HTML STATE: " + htmlComponent.Data+aud.src;
+                    },true);
+                    aud.addEventListener("ended", function(event) {
+                        htmlComponent.Data = 4;
+                        document.getElementById("dataInHTML").innerHTML = "HTML STATE: " + htmlComponent.Data;
+                    },true);
+                    htmlComponent.Data = 0;
+                } else if(htmlComponent.Data[0] == 0) {
+                    aud.src = htmlComponent.Data[1];
+                    if (aud.networkState == 3) {
+                    document.getElementById("dataInHTML").innerHTML = "HTML STATE: no source found: "+aud.src;
+                    } else {
+                    document.getElementById("dataInHTML").innerHTML = "HTML STATE: "+(aud.networkState+5)+": "+aud.src;
+                    }                    
+                } else if (htmlComponent.Data[0] == 2){
+                            aud.play();
+                } 
+            
+        });           
+	};
+
+</script>
+</head>
+
+<body>
+    <div id="statusText">
+    <span><label for="statusText"><strong>Program State Info from matlab and javascript will display here:</strong></label></span>
+    <div id="dataFromMATLAB">
+        Matlab Data Not Sent
+    </div>
+    <div id="dataInHTML">
+        HTML data not yet initialized
+    </div>
+    
+    
+    <audio id = "matlabWebAudioPlayer" preload = "auto">
+    </audio>
+</body>
+
+</html>
