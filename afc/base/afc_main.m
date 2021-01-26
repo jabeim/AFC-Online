@@ -1141,8 +1141,7 @@ while ( work.numrun <= work.numrunMax & abortall == 0)	% changed 4/7/2000 checks
     	eval([def.measurementProcedure '_init']);
     end
     % end of expanding fields for interleaving
-
-
+    
     eval([def.expname '_set']);					% calls set-function of the experiment
 
     if ( def.modelEnable > 0 )

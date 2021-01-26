@@ -37,10 +37,10 @@ set(h,'Userdata',-1);
 %end
 if isfield(def,'afc_win')
     %% update message to thank user/close tab
-def.afc_message.Value = 'Thank you for participating in this experiment. You may now close the window.';
-  
+    def.afc_message.Value = 'Thank you for participating in this experiment. You may now close the window.';
+    
 else
-delete(h);						% delete win
+    delete(h);						% delete win
 end
 
 % FIXME: wait for quiet init ans skip this

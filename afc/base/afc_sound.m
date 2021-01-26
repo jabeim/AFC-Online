@@ -554,35 +554,35 @@ switch ( action )
                 end
                 work.soundres = snd_multi([1 0 def.samplerate def.bits],work.out');
             case 'webAudio'
-                
+                % here is where we write the sound to file and pass the
+                % state update to html element
                 if isempty(def.webAudioPlayer.Data)  % dirty initialization, using afc_sound('init') doesnt work because the html is added later
-                    def.webAudioPlayer.Data = {-1};
-                    waitfor(def.webAudioPlayer,'Data',0);
+                    def.webAudioPlayer.Data = {-1}; % send initialization code to html module to build triggers for required audio playback status events
+                    waitfor(def.webAudioPlayer,'Data',0); % wait for html code to return success code
 %                     disp('init success')
                 end
                 
-                work.audioFileName = [work.vpname '_' work.condition '_' num2str(work.numrun) '_' num2str(work.presentationCounter) '.wav'];
-                work.elapsedTime = work.elapsedTime+length(work.out)/def.samplerate+4;
-                if exist([def.webAudioPath work.audioFileName],'file'); delete(work.audioFileName); end % delete previous file if it exists
+                work.audioFileName = [work.vpname '_' work.condition '_' num2str(work.numrun) '_' num2str(work.presentationCounter) '.wav']; % generate unique file name to support multiple concurrent sessions              
+                if exist([def.webAudioPath work.audioFileName],'file'); delete(work.audioFileName); end % delete previous file if it exists    
                 
+                audioTimeStart = tic; % start timer to measure buffer/loading
+                audiowrite([def.webAudioPath work.audioFileName],work.out,def.samplerate,'BitsPerSample',def.bits); %write the stimulus to a temporary .wav file on the network for playback                
+                pause(.1); % wait after file write command to ensure file is available on network resource               
                 
-                audiowrite([def.webAudioPath work.audioFileName],work.out,def.samplerate,'BitsPerSample',def.bits);
-                pause(.1);
-
-
-                def.webAudioPlayer.Data = {0,work.audioFileName};
-%                 def.afc_message.Value = ['Downloading Audio... ' work.audioFileName];
-%                 drawnow;
-            
-                waitfor(def.webAudioPlayer,'Data',1);
+                def.webAudioPlayer.Data = {0,work.audioFileName}; % initialize audio track            
+                waitfor(def.webAudioPlayer,'Data',1);   % wait for 'canPlayThrough' event code
                 
-%                 def.afc_message.Value = 'Playback Command Sent';
-                def.webAudioPlayer.Data = {2};
-%                 drawnow;
-                waitfor(def.webAudioPlayer,'Data',3)  % this line may cause timing delay
+                def.webAudioPlayer.Data = {2}; % send the start playing command
+                waitfor(def.webAudioPlayer,'Data',3)  % wait for 'isPlaying' event
+                loadingTime = toc(audioTimeStart); % this includes some latency added by the status code 3 being sent back via web.
                 
-                % here is where we write the sound to file and pass the
-                % state update to html element
+                work.elapsedTime = work.elapsedTime+length(work.out)/def.samplerate;  % stimulus playback time
+                work.elapsedTime = work.elapsedTime+loadingTime;                      % add additional time based on file loading on remote computer
+                
+                if isfield(def,'trialResponseIntervalTime')
+                    work.elapsedTime = work.elapsedTime+def.trialResponseIntervalTime;% add fixed time defined in cfg for allowable response (regardless of actual response time)
+                end
+                
 
             case ''
 
